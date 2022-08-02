@@ -2,6 +2,7 @@ module getters
 
 import os
 import term
+import math as maths
 
 const icons = {
 	"user": term.bold(term.red("\uf007 ") + "user\t\t│ ")
@@ -88,7 +89,8 @@ pub fn memory() string {
 		}
 		return icons["mem"] + (total / 1024 / 1024 / 1024).str() + "GB\n"
 	} else {
-		return icons["mem"] + (os.execute("cat /proc/meminfo").output.split("\n")[0].split(":")[1].trim_space().split(" ")[0].i64() / 1024 / 1024 / 1024).str() + "GB\n"
+		total := (os.execute("cat /proc/meminfo").output.split("\n")[0].split(":")[1].trim_space()#[..-3]).f64()
+		return icons["mem"] + maths.ceil((total / 1024 / 1024)).str()#[..-1] + "GB\n"
 	}
 }
 
