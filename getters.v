@@ -18,6 +18,7 @@ const icons = {
 	"disk": term.bold(term.blue("\uf7c9 ") + "space\t\t│ ")
 	"mem": term.bold(term.green("\ufb19 ") + "memory\t│ ")
 	"uptime": term.bold(term.green("\uf017 ") + "uptime\t│ ")
+	"colors": term.bold(term.cyan("\ue22b ") + "colors\t│ ")
 }
 
 pub fn user() string {
@@ -33,7 +34,7 @@ pub fn host() string {
 }
 
 pub fn os() string {
-	return icons[os.user_os()] + os.uname().sysname.trim_space() + "\n"
+	return icons[os.user_os()] + os.uname().sysname.trim_space() + " (" + os.uname().machine.trim_space() + ")\n"
 }
 
 pub fn version() string {
@@ -105,6 +106,10 @@ pub fn uptime() string {
 		hours := total_hours % 24
 		return icons["uptime"] + "$days days, $hours hours\n"
 	}
+}
+
+pub fn colors() string {
+	return icons["colors"] + term.bright_magenta("██") + term.bright_red("██") + term.bright_yellow("██") + term.bright_green("██") + term.bright_cyan("██") + term.bright_blue("██") + term.bright_white("██") + term.bright_black("██") + term.bold("\n\t\t│ ") + term.magenta("██") + term.red("██") + term.yellow("██") + term.green("██") + term.cyan("██") + term.blue("██") + term.white("██") + term.black("██")
 }
 
 pub fn divider() string {

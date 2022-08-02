@@ -14,4 +14,6 @@ fn main() {
 	print(get.cpu())
 	print(get.gpu())
 	print(get.memory())
+	print(get.divider())
+	print(get.colors())
 }
