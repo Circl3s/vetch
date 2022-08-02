@@ -3,13 +3,13 @@ module main
 import getters as get
 
 fn main() {
-	println(get.user())
-	println(get.host())
-	println(get.os())
-	println(get.version())
-	println(get.term()?)
-	println(get.shell()?)
-	println(get.divider())
-	println(get.cpu())
-	println(get.gpu()?)
+	print(get.user())
+	print(get.host())
+	print(get.os())
+	print(get.version())
+	print(get.term())
+	print(get.shell())
+	print(get.divider())
+	print(get.cpu())
+	print(get.gpu())
 }

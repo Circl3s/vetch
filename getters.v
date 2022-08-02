@@ -19,67 +19,65 @@ const icons = {
 }
 
 pub fn user() string {
-	return icons["user"] + os.loginname()
+	return icons["user"] + os.loginname() + "\n"
 }
 
 pub fn host() string {
 	if os.user_os() == "windows" {
-		return icons["host"] + os.execute("hostname").output.trim_space()
+		return icons["host"] + os.execute("hostname").output.trim_space() + "\n"
 	} else {
-		return icons["host"] + os.hostname().trim_space()
+		return icons["host"] + os.hostname().trim_space() + "\n"
 	}
 }
 
 pub fn os() string {
-	return icons[os.user_os()] + os.uname().sysname.trim_space()
+	return icons[os.user_os()] + os.uname().sysname.trim_space() + "\n"
 }
 
 pub fn version() string {
-	return icons["ver"] + os.uname().release.trim_space()
+	return icons["ver"] + os.uname().release.trim_space() + "\n"
 }
 
 pub fn cpu() string {
 	if os.user_os() == "windows" {
-		return icons["cpu"] + os.execute("wmic cpu get name").output.split("\n")[1].trim_space() + " (${os.execute("wmic cpu get numberofcores").output.split("\n")[1].trim_space()} cores / ${os.execute("wmic cpu get numberoflogicalprocessors").output.split("\n")[1].trim_space()} threads)"
+		return icons["cpu"] + os.execute("wmic cpu get name").output.split("\n")[1].trim_space() + " (${os.execute("wmic cpu get numberofcores").output.split("\n")[1].trim_space()} cores / ${os.execute("wmic cpu get numberoflogicalprocessors").output.split("\n")[1].trim_space()} threads)" + "\n"
 	} else {
-		lines := os.read_lines("/proc/cpuinfo") or {
-			return icons["cpu"] + "Unknown"
-		}
-		return icons["cpu"] + lines[4].split(":")[1].trim_space() + " (${lines[12].split(":")[1].trim_space()} cores / ${lines[10].split(":")[1].trim_space()} threads"
+		lines := os.execute("cat /proc/cpuinfo").output.split("\n")
+		return icons["cpu"] + lines[4].split(":")[1].trim_space() + " (${lines[12].split(":")[1].trim_space()} cores / ${lines[10].split(":")[1].trim_space()} threads" + "\n"
 	}
 }
 
-pub fn gpu() ?string {
+pub fn gpu() string {
 	if os.user_os() == "windows" {
-		return icons["gpu"] + os.execute("wmic path win32_VideoController get name").output.split("\n")[1].trim_space()
+		return icons["gpu"] + os.execute("wmic path win32_VideoController get name").output.split("\n")[1].trim_space() + "\n"
 	} else {
-		return none
+		return ""
 	}
 }
 
-pub fn term() ?string {
+pub fn term() string {
 	if os.getenv("TERM_PROGRAM") != "" {
-		return icons["term"] + os.getenv("TERM_PROGRAM").trim_space()
+		return icons["term"] + os.getenv("TERM_PROGRAM").trim_space() + "\n"
 	} else if os.getenv("SSH_TTY") != "" {
-		return icons["term"] + "tty"
+		return icons["term"] + "tty" + "\n"
 	} else {
-		return none
+		return ""
 	}
 }
 
-pub fn shell() ?string {
+pub fn shell() string {
 	if os.user_os() == "windows" {
 		//TODO: Figure out windows shell
 		if os.getenv("STARSHIP_SHELL") != "" {
-			return icons["shell"] + os.getenv("STARSHIP_SHELL").trim_space()
+			return icons["shell"] + os.getenv("STARSHIP_SHELL").trim_space() + "\n"
 		} else {
-			return none
+			return ""
 		}
 	} else {
-		return icons["shell"] + os.getenv("SHELL").trim_space()
+		return icons["shell"] + os.getenv("SHELL").trim_space() + "\n"
 	}
 }
 
 pub fn divider() string {
-	return term.bold("\t\t│")
+	return term.bold("\t\t│\n")
 }
