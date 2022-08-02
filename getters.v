@@ -60,8 +60,6 @@ pub fn gpu() string {
 pub fn term() string {
 	if os.getenv("TERM_PROGRAM") != "" {
 		return icons["term"] + os.getenv("TERM_PROGRAM").trim_space() + "\n"
-	} else if os.getenv("SSH_TTY") != "" {
-		return icons["term"] + os.getenv("SSH_TTY").trim_space() + "\n"
 	} else {
 		return ""
 	}
