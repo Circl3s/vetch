@@ -216,7 +216,7 @@ pub fn (g Getter) storage() string {
 		disks := g.ps_result.disks
 		mut final_string :=  ""
 		for i, disk in disks {
-			final_string += if i == 1 {icons["disk"]} else {term.bold("\t\t│ ")} + "${disk.name} ${bar(disk.free, disk.size)}\n"
+			final_string += if i == 0 {icons["disk"]} else {term.bold("\t\t│ ")} + "${disk.name} ${bar(disk.free, disk.size)}\n"
 		}
 		return final_string
 	} else {
@@ -233,7 +233,7 @@ pub fn (g Getter) storage() string {
 		for i, part in parts {
 			free := os.execute("df $part.mountpoint --output=avail").output.split("\n")[1].trim_space().i64()
 			total := os.execute("df $part.mountpoint --output=size").output.split("\n")[1].trim_space().i64()
-			final_string += if i == 1 {icons["disk"]} else {term.bold("\t\t│ ")} + "${part.mountpoint}\t ${bar(free * 1024, total * 1024)}\n"
+			final_string += if i == 0 {icons["disk"]} else {term.bold("\t\t│ ")} + "${part.mountpoint}\t ${bar(free * 1024, total * 1024)}\n"
 		}
 		return final_string
 	}
