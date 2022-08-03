@@ -1,8 +1,9 @@
 module main
 
-import getters as get
+import getters
 
 fn main() {
+	get := getters.new_getter()
 	print(get.user())
 	print(get.host())
 	print(get.uptime())
@@ -14,6 +15,7 @@ fn main() {
 	print(get.cpu())
 	print(get.gpu())
 	print(get.memory())
+	print(get.storage())
 	print(get.divider())
 	print(get.colors())
 }
