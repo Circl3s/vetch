@@ -186,12 +186,37 @@ pub fn (g Getter) memory() string {
 	}
 }
 
+fn bar(free i64, total i64) string {
+	ratio := int(maths.round(f64(free) / f64(total) * 20))
+	used_blocks := 20 - ratio
+	free_string := "${free / 1024 / 1024 / 1024}G free"
+	total_string := "${total / 1024 / 1024 / 1024}G total"
+	start := 20 - free_string.len
+	mut final_string := ""
+	for i in 0 .. 20 {
+		if i < used_blocks {
+			if i >= start {
+				final_string += term.bg_red(term.black(rune(free_string[i - start]).str()))
+			} else {
+				final_string += term.red("█")
+			}
+		} else {
+			if i >= start {
+				final_string += term.bg_green(term.black(rune(free_string[i - start]).str()))
+			} else {
+				final_string += term.green("█")
+			}
+		}
+	}
+	return final_string + " / $total_string"
+}
+
 pub fn (g Getter) storage() string {
 	if os.user_os() == "windows" {
 		disks := g.ps_result.disks
-		mut final_string := icons["disk"] + "${disks[0].name} ${(disks[0].size - disks[0].free) / 1024 / 1024 / 1024}GB / ${disks[0].size / 1024 / 1024 / 1024}GB\n"
-		for disk in disks[1..] {
-			final_string += term.bold("\t\t│ ") + "${disk.name} ${(disk.size - disk.free) / 1024 / 1024 / 1024}GB / ${disk.size / 1024 / 1024 / 1024}GB\n"
+		mut final_string :=  ""
+		for i, disk in disks {
+			final_string += if i == 1 {icons["disk"]} else {term.bold("\t\t│ ")} + "${disk.name} ${bar(disk.free, disk.size)}\n"
 		}
 		return final_string
 	} else {
@@ -204,9 +229,11 @@ pub fn (g Getter) storage() string {
 			}
 		}
 		parts = parts.filter(it.mountpoint != "")
-		mut final_string := icons["disk"] + "${parts[0].mountpoint}\t\t ${os.execute("df " + parts[0].mountpoint + " --output=used -h").output.split("\n")[1].trim_space()} / ${parts[0].size}\n"
-		for part in parts[1..] {
-			final_string += term.bold("\t\t│ ") + "${part.mountpoint}\t\t ${os.execute("df " + part.mountpoint + " --output=used -h").output.split("\n")[1].trim_space()} / ${part.size}\n"
+		mut final_string := ""
+		for i, part in parts {
+			free := os.execute("df $part.mountpoint --output=avail").output.split("\n")[1].trim_space().i64()
+			total := os.execute("df $part.mountpoint --output=size").output.split("\n")[1].trim_space().i64()
+			final_string += if i == 1 {icons["disk"]} else {term.bold("\t\t│ ")} + "${part.mountpoint}\t ${bar(free, total)} / ${part.size}\n"
 		}
 		return final_string
 	}
