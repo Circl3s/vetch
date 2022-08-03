@@ -203,9 +203,10 @@ pub fn (g Getter) storage() string {
 				parts << part
 			}
 		}
-		mut final_string := icons["disk"] + "${parts[0].name}: ${parts[0].size}\n"
+		parts = parts.filter(it.mountpoint != "")
+		mut final_string := icons["disk"] + "${parts[0].mountpoint}\t\t ${os.execute("df " + parts[0].mountpoint + " --output=used -h").output.split("\n")[1].trim_space()} / ${parts[0].size}\n"
 		for part in parts[1..] {
-			final_string += term.bold("\t\t│ ") + "${part.name}: ${part.size}\n"
+			final_string += term.bold("\t\t│ ") + "${part.mountpoint}\t\t ${os.execute("df " + part.mountpoint + " --output=used -h").output.split("\n")[1].trim_space()} / ${part.size}\n"
 		}
 		return final_string
 	}
