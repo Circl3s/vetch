@@ -71,7 +71,7 @@ const icons = {
 	"ver": term.bold(term.magenta("\uf02b ") + "kernel\t│ ")
 	"cpu": term.bold(term.red("\uf85a ") + "cpu\t\t│ ")
 	"gpu": term.bold(term.yellow("\ufcfb ") + "gpu\t\t│ ")
-	"disk": term.bold(term.blue("\uf7c9 ") + "space\t\t│ ")
+	"disk": term.bold(term.blue("\uf7c9 ") + "storage\t│ ")
 	"mem": term.bold(term.green("\ufb19 ") + "memory\t│ ")
 	"uptime": term.bold(term.green("\uf017 ") + "uptime\t│ ")
 	"colors": term.bold(term.cyan("\ue22b ") + "colors\t│ ")
