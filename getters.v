@@ -156,17 +156,12 @@ pub fn (g Getter) term() string {
 }
 
 pub fn (g Getter) shell() string {
+	pid := os.getppid()
 	mut shell := ""
-	match true {
-		os.getenv("SHELL") != "" {
-			shell = os.getenv("SHELL")
-		}
-		os.getenv("STARSHIP_SHELL") != "" {
-			shell = os.getenv("STARSHIP_SHELL")
-		}
-		else {
-			shell = ""
-		}
+	if os.user_os() == "windows" {
+		shell = os.execute('tasklist /FI "PID eq $pid"').output.split("\n")[2].split(" ")[0]
+	} else {
+		shell = os.execute("ps -p $pid -o comm").output.split("\n")[1].trim_space()
 	}
 	if shell != "" {
 		return icons["shell"] + shell.split(if os.user_os() == "windows" {"\\"} else {"/"}).last().trim_space() + "\n"
