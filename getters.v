@@ -140,7 +140,10 @@ pub fn (g Getter) gpu() string {
 	if os.user_os() == "windows" {
 		return icons["gpu"] + g.ps_result.gpu + "\n"
 	} else {
-		return ""
+		lspci := os.execute('lspci -d *::0300 -mm').output.split('" ')
+		vendor := lspci[1].trim('"')
+		device := lspci[2].trim('"')
+		return icons["gpu"] + vendor.trim_space() + " " + device.trim_space() + "\n"
 	}
 }
 
