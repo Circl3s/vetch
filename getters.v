@@ -156,12 +156,14 @@ pub fn (g Getter) term() string {
 }
 
 pub fn (g Getter) shell() string {
-	pid := os.getppid()
 	mut shell := ""
 	if os.user_os() == "windows" {
-		shell = os.execute('tasklist /FI "PID eq $pid"').output.split("\n")[3].split(".exe")[0]
+		pid := os.getpid()
+		ppid := os.execute('wmic process where (processid=$pid) get parentprocessid').output.split("\n")[1].trim_space()
+		shell = os.execute('tasklist /FI "PID eq $ppid"').output.split("\n")[3].split(".exe")[0]
 	} else {
-		shell = os.execute("ps -p $pid -o comm").output.split("\n")[1].trim_space()
+		ppid := os.getppid()
+		shell = os.execute("ps -p $ppid -o comm").output.split("\n")[1].trim_space()
 	}
 	if shell != "" {
 		return icons["shell"] + shell.split(if os.user_os() == "windows" {"\\"} else {"/"}).last().trim_space() + "\n"
