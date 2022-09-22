@@ -3,7 +3,10 @@ module main
 import getters
 
 fn main() {
-	get := getters.new_getter()
+	get := getters.new_getter() or {
+		println(err)
+		return
+	}
 	print(get.user())
 	print(get.host())
 	print(get.uptime())

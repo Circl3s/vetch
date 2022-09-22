@@ -82,28 +82,36 @@ pub struct Getter {
 	ps_result PSResult
 }
 
-pub fn new_getter() Getter {
-	return Getter{
-		lsblk: if os.user_os() == "linux" {
-			json.decode(Lsblk, os.execute("lsblk --json").output) or {
+pub fn new_getter() ?Getter {
+	if os.user_os() == "linux" || os.user_os() == "macos" {
+		return Getter {
+			lsblk: json.decode(Lsblk, os.execute("lsblk --json").output) or {
 				Lsblk{}
 			}
-		} else {
-			Lsblk{}
+			ps_result: PSResult{}
 		}
-		ps_result: if os.user_os() == "windows" {
-			os.write_file("./vetch.ps1", ps_script) or {
-				panic(err)
-			}
-			defer {
-				os.rm("./vetch.ps1") or {}
-			}
-			json.decode(PSResult, os.execute('powershell -NoProfile ./vetch.ps1').output) or {
-				PSResult{}
-			}
-		} else {
-			PSResult{}
+	} else if os.user_os() == "windows" {
+		os.write_file("./vetch.ps1", ps_script) or {
+			panic(err)
 		}
+		defer {
+			os.rm("./vetch.ps1") or {}
+		}
+		raw_result := os.execute('powershell -NoProfile ./vetch.ps1').output
+		result := json.decode(PSResult, raw_result) or {
+			execpol := os.execute("powershell -NoProfile Get-ExecutionPolicy").output.trim_space()
+			if execpol == "Restricted" || execpol == "AllSigned" {
+				return error(term.fail_message("PowerShell execution policy is set to $execpol!") + term.warn_message('\nEnable running scripts on this system by running "Set-ExecutionPolicy RemoteSigned"'))
+			}
+			println(raw_result)
+			return error(term.fail_message("Couldn't parse PowerShell output.") + term.warn_message("\nThe output has been dumped above. Show it to the developer."))
+		}
+		return Getter {
+			lsblk: Lsblk{}
+			ps_result: result
+		}
+	} else {
+		return error("Your OS isn't yet supported.")
 	}
 }
 
@@ -129,7 +137,7 @@ pub fn (g Getter) version() string {
 
 pub fn (g Getter) cpu() string {
 	if os.user_os() == "windows" {
-		return icons["cpu"] + "${g.ps_result.cpu} (${g.ps_result.cores} cores / ${g.ps_result.threads} threads)\n"
+		return icons["cpu"] + "${g.ps_result.cpu.trim_space()} (${g.ps_result.cores} cores / ${g.ps_result.threads} threads)\n"
 	} else {
 		lines := os.execute("cat /proc/cpuinfo").output.split("\n")
 		return icons["cpu"] + lines[4].split(":")[1].trim_space() + " (${lines[12].split(":")[1].trim_space()} cores / ${lines[10].split(":")[1].trim_space()} threads)" + "\n"
@@ -179,10 +187,10 @@ pub fn (g Getter) memory() string {
 		for cap in mems {
 			total += cap
 		}
-		return icons["mem"] + (total / 1024 / 1024 / 1024).str() + "GB\n"
+		return icons["mem"] + (total / 1024 / 1024 / 1024).str() + "G\n"
 	} else {
 		total := (os.execute("cat /proc/meminfo").output.split("\n")[0].split(":")[1].trim_space()#[..-3]).f64()
-		return icons["mem"] + maths.ceil((total / 1024 / 1024)).str()#[..-1] + "GB\n"
+		return icons["mem"] + maths.ceil((total / 1024 / 1024)).str()#[..-1] + "G\n"
 	}
 }
 
