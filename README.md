@@ -16,8 +16,6 @@ You can download a binary from [releases](https://github.com/Circl3s/vetch/relea
 ```
 
 ## TODO
-- Unix GPU detection
-- Better universal shell detection
 - Support/test more OSes
 
 ## Contributing
